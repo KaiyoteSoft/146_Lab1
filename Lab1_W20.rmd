@@ -1,0 +1,190 @@
+---
+title: "Lab 1"
+author: "Kai Oda"
+date: "1/10/2020"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo =TRUE)
+knitr::opts_knit$set("~/Biology/146/Lab 1")
+```
+
+# Today's goals
+
+* Key aspects of a markdown document
+* Importing data
+* Loading packages
+* Basic data exploration
+
+# Welcome to Markdown!
+
+There are a couple of key features in each markdown document, including this one!
+
+They are:
+
+1. A header section. Here the title, author, date, and output are all listed. You should edit these for each homework that you turn in.
+
+2. A setup section. Here, we only have one line of code that tells R to show all the output of all the chunks (see below). This is usually where we import all necessary datasets and packages that contain functions used in our analyses.
+
+3. A text section. That's where we are now. You can include headers, intro paragraphs, explanations etc. in this section. If you want to learn how to use LaTex formatting in your descriptions, that's great! To learn more about formatting, check out this R Markdown cheat sheet: https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf 
+
+# Big header
+## Medium header
+### Small header
+#### Teeny header
+##### Does this go on forever?
+###### Apparently, yes
+
+**Bold**
+
+*Italics*
+
+__Underline__
+
+
+4. A chunk. This is where all the magic happens. Look below, here is our first main coding chunk (technically our setup section is also a chunk). These are always set up the same way. What happens if you type " '''{r} " in a new line? To end the chunk, you simply type another " ''' ". Try it here:
+
+```{r}
+### ya!
+2+2
+1+7
+5*8
+12/3
+12.1/3
+```
+
+
+Now try knitting your document!
+It's a good idea to knit regularly, especially when you are working on longer projects that involve different data objects and different packages.
+R markdown is linear, and it knits your document like movie credits (or the Star Wars text intros): one chunk after another. If you import a dataset in a chunk below where you call a function on it, you'll get an error.
+
+# Importing Data
+
+To use R for data analysis, you must know how to import data sets. There are several different ways to this. The best for R markdown is to save the data file in your *working directory*. A working directory is your home folder. Each time you start up R, you start working in the default working directory. You can figure out what this is by typing:
+
+```{r}
+
+getwd()
+
+```
+
+Yours will likely say something a little different. 
+
+For this class, it's best to organize each R markdown in its own folder that also contains the dataset(s) you're working with. You can check what files are in your working directory by running:
+
+```{r}
+list.files()
+
+```
+
+This is also visible in the navigation panel if you click "Files" > "More" > "Go to Working Directory".
+
+Let's start with our first file!
+
+```{r}
+# Read in the data
+
+# Note: you can comment on your code within a chunk by preceding it with a "#"
+
+bats = read.csv("battongues.csv")
+# Here we just created a variable called bats that contains all the data. 
+
+
+# Now we can look at it:
+bats
+
+```
+
+You can also use the function:
+
+View(bats)
+
+To view the data table in a new window. Sometimes this is helpful for scanning through the data and getting familiar with it. However, this will not run when you try to knit your document, so it's best to comment it out.
+
+```{r}
+# Try uncommenting this:
+#View(bats)
+
+# I like to use the following functions to get to know the data:
+head(bats)
+dim(bats)
+summary(bats)
+
+# look up the help files for these functions. What do they do?
+
+```
+
+You may have noticed that the column names are quite unwieldy. We are going to want to change those to make things easier down the line:
+
+```{r}
+names(bats)
+
+# If we want to change all the names we can do this:
+names(bats) = c("Sp", "Palate","Tongue")
+
+# check it out
+names(bats)
+
+# If we want to change just the first column, we do this:
+names(bats)[1] = "Species"
+
+# Your turn: change the second column name to "p_length" and the third column name to "t_length"
+
+
+# hint: you can do this in one go!
+names(bats)[2:3] = c("p_length","t_length")
+head(bats)
+
+```
+
+# Basic plots
+
+Data analysis is much more fun when you can look at plots! Here, we will just create a few basic plots using R's base package. These can be used to quickly view the data. However, using a package called ggplot will give you more beautiful graphics more easily.
+
+```{r}
+# making a plot is as simple as:
+
+plot(bats$p_length, bats$t_length, main="Palate and tongue length in different bat species")
+
+hist(bats$p_length)
+plot(density(bats$p_length))
+
+
+```
+
+# Using ggplot
+
+## Packages
+
+Packages are like mini pieces of software (or apps!) that work within R. They contain all kinds of functions for analyses, computations, and plotting. Many packages are frequently cited in academic papers. If using a package for an analysis, you should cite it and include the version of R that you are using. Sometimes updates are made, and we want our research to be as reproducible as possible!
+
+You can see what packages are available if you click on the packages tab in your navigation window.
+
+```{r}
+# install(ggplot2)
+library(ggplot2)
+
+# Copy this code and paste it below in the same chunk. Then play around with the parameters. Can you figure out how to change the color of only one point?
+
+ggplot(bats, aes(x=p_length, y=t_length))+
+  geom_point()+
+  geom_text(aes(label=Species), size=3, vjust="inward", hjust="inward")+
+  labs(x="Palate length (mm)", y="Tongue length (mm)")
+
+# one of many ways to do this:
+ggplot(bats, aes(x=p_length, y=t_length))+
+  geom_point(aes(color=ifelse(t_length>60,"A","B")))+
+  guides(color=F)+
+  geom_text(aes(label=Species), size=3, vjust="inward", hjust="inward")+
+  labs(x="Palate length (mm)", y="Tongue length (mm)")
+
+```
+
+What do you notice? 
+You're a biologist, so go check out a picture of *Anoura fistulata*! Why does it have such a long tongue?
+
+
+#### End of lab ####
